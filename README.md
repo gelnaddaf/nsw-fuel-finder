@@ -2,25 +2,6 @@
 
 A Cloudflare Edge web application that provides real-time fuel price comparison across NSW using the NSW Government Fuel API.
 
-## Project Status
-
-| Milestone | Status |
-|-----------|--------|
-| Project Setup & README | ✅ Complete |
-| Cloudflare Account Connectivity | ✅ Complete |
-| NSW Fuel API Keys | ✅ Complete |
-| Project Scaffolding | ✅ Complete |
-| Workers API Layer | ✅ Complete |
-| Frontend (React SPA) | ✅ Complete |
-| Map Integration | ✅ Complete |
-| D1 Database + KV Cache | ✅ Complete |
-| Local Dev Server | ✅ Complete |
-| Rate Limiting + Caching | ✅ Complete |
-| Deployment to Cloudflare | ✅ Live |
-| PWA Support | ✅ Complete |
-| Security Hardening | ✅ Complete |
-| Cloudflare Access (Zero Trust) | ✅ Active |
-
 ## Tech Stack
 
 | Layer | Technology |
@@ -64,14 +45,13 @@ A Cloudflare Edge web application that provides real-time fuel price comparison 
 - [x] PWA support (manifest, service worker, offline caching, app icons)
 - [x] Install prompt banner (Android native install + iOS instructions)
 - [x] Security hardening (CORS lockdown, input validation, security headers, error sanitization)
-- [x] Cloudflare Access (Zero Trust) — site locked to owner email only
-- [ ] Favourite stations
+- [x] Cloudflare Access (Zero Trust authentication)
 
 ## Project Structure
 
 ```
 GOVProject/
-├── README.md                       # This file — source of truth
+├── README.md                       # Project documentation
 ├── wrangler.toml                   # Cloudflare Workers config (D1, KV, assets)
 ├── package.json                    # Dependencies
 ├── vite.config.ts                  # Vite build config
@@ -129,13 +109,3 @@ npm run deploy
 npm run db:migrate
 ```
 
-## Changelog
-
-- **2026-02-12** — Project initialized. README created. Cloudflare connectivity verified. NSW Fuel API keys verified (3,284 stations, 10,659 prices confirmed). Full project scaffolded: Vite + React + TailwindCSS frontend, Cloudflare Worker API with OAuth token management, KV caching, D1 schema. Components: Header, SearchBar, FuelTypeFilter, StatsBar, FuelList, FuelCard, MapView. Local dev server running on localhost:8787.
-- **2026-02-12** — Deployed to Cloudflare: https://nsw-fuel-finder.george-elnaddaf.workers.dev. Added location/nearby search caching (5-min KV TTL per suburb+fueltype), IP-based rate limiting (20 req/min), fixed Invalid Date parsing (DD/MM/YYYY). Production secrets set via `wrangler secret put`.
-- **2026-02-12** — Bug fixes: (1) Location search changed from GET to POST (NSW API requirement). (2) Fuel type codes fixed: P95/P98 instead of U95/U98, added E85. (3) Added detailed API logging to Worker. (4) Fixed "Browse all NSW stations" returning empty — type mismatch between station.code (string) and price.stationcode (number), fixed with String() coercion. (5) Switched all endpoints from v2 to v1 for NSW-only data (v2 included Tasmania).
-- **2026-02-12** — Rate limit fix: increased from 20 to 60 req/min (was blocking normal use). Added suburb autocomplete (736 suburbs extracted from station addresses, KV-cached 1hr).
-- **2026-02-12** — New features: (1) Price History Chart — SVG-based, 7/14/30-day views, shows avg/min/max/trend stats, powered by D1 cron snapshots every 6hrs. (2) Google Maps Directions — each station card has a "Directions" link opening turn-by-turn navigation. (3) Trip Cost Calculator — enter litres, see dollar cost per station + savings vs most expensive. Admin snapshot endpoint added for manual D1 seeding.
-- **2026-02-12** — PWA support: manifest.json, service worker with network-first HTML / cache-first hashed assets strategy, 192px + 512px app icons, InstallPrompt component with native install on Android/Chrome and manual instructions on iOS. Fixed blank-page bug caused by service worker caching stale HTML.
-- **2026-02-12** — Security hardening: (1) Removed all hardcoded secrets from README (replaced with placeholders). (2) CORS locked to production domain + localhost only (was wildcard *). (3) Security headers added: X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy. (4) Error messages sanitized — no internal details leaked to clients. (5) Input validation on all query params: fuel type whitelist, suburb length cap, numeric coord validation, radius/days bounds.
-- **2026-02-12** — Cloudflare Access (Zero Trust) enabled: site protected by email OTP authentication, locked to owner email only. Free tier, no code changes required.
