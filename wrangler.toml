@@ -1,0 +1,27 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "nsw-fuel-finder"
+main = "src/worker/index.ts"
+compatibility_date = "2025-02-01"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[vars]
+NSW_FUEL_API_BASE = "https://api.onegov.nsw.gov.au"
+
+# KV namespace for caching fuel data and OAuth tokens
+[[kv_namespaces]]
+binding = "FUEL_CACHE"
+id = "4dc4b713a7824574b9c955e83c3d2f5f"
+
+# D1 database for historical price data
+[[d1_databases]]
+binding = "DB"
+database_name = "nsw-fuel-db"
+database_id = "c1bf122d-441a-4fa9-a7af-3e6838699e63"
+
+# Cron trigger: snapshot prices every 6 hours for historical tracking
+[triggers]
+crons = ["0 */6 * * *"]

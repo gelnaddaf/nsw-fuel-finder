@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply min-h-screen bg-gray-50;
+  }
+}
+
+@layer components {
+  .fuel-card {
+    @apply rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md;
+  }
+  .price-badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-sm font-bold;
+  }
+  .price-cheap {
+    @apply bg-green-100 text-green-800;
+  }
+  .price-mid {
+    @apply bg-amber-100 text-amber-800;
+  }
+  .price-expensive {
+    @apply bg-red-100 text-red-800;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out;
+}
