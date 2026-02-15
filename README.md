@@ -67,71 +67,6 @@ A Cloudflare Edge web application that provides real-time fuel price comparison 
 - [x] Cloudflare Access (Zero Trust) — site locked to owner email only
 - [ ] Favourite stations
 
-## Session Resume Guide
-
-> **IMPORTANT:** When reopening this project in a new Windsurf session, tell Cascade:
-> *"Read the README.md and resume where we left off."*
-> This section contains everything needed to reconnect and continue working.
-
-### Cloudflare Connection
-
-- **Email:** (see `.dev.vars` or Cloudflare dashboard)
-- **Account ID:** (see Cloudflare dashboard → Overview)
-- **Auth method:** Global API Key (stored as env var, never in code)
-- **Wrangler CLI:** Installed globally (`wrangler v4.64.0`)
-- **Connect command (PowerShell):**
-  ```powershell
-  $env:CLOUDFLARE_API_TOKEN="<your-global-api-key>"
-  $env:CLOUDFLARE_EMAIL="<your-email>"
-  wrangler whoami
-  ```
-
-### NSW Fuel API Connection
-
-- **Portal:** [api.nsw.gov.au](https://api.nsw.gov.au) (registered as george.elnaddaf@gmail.com)
-- **Subscription:** Fuel Check Portal Api (approved)
-- **Auth flow:** Two-step — get Bearer token first, then use it for data requests
-- **Credentials stored in:** `.dev.vars` (gitignored, never committed)
-- **Auth test command (PowerShell):**
-  ```powershell
-  # Step 1: Get access token (uses NSW_FUEL_API_AUTH from .dev.vars)
-  $auth = @{ "Authorization" = "Basic <base64-encoded-key:secret — see .dev.vars>" }
-  $token = (Invoke-RestMethod -Uri "https://api.onegov.nsw.gov.au/oauth/client_credential/accesstoken?grant_type=client_credentials" -Headers $auth).access_token
-
-  # Step 2: Fetch fuel prices (uses NSW_FUEL_API_KEY from .dev.vars)
-  $headers = @{ "Authorization"="Bearer $token"; "apikey"="<your-api-key>"; "transactionid"=[guid]::NewGuid().ToString(); "requesttimestamp"=(Get-Date -Format "dd/MM/yyyy hh:mm:ss tt") }
-  $data = Invoke-RestMethod -Uri "https://api.onegov.nsw.gov.au/FuelPriceCheck/v1/fuel/prices" -Headers $headers
-  Write-Host "Stations: $($data.stations.Count), Prices: $($data.prices.Count)"
-  ```
-- **Token lifetime:** ~12 hours (43,199 seconds) — auto-refreshed by Workers API
-- **Confirmed data:** 3,284 stations, 10,659 price entries across NSW
-
-### Key Files for Secrets
-
-| File | Purpose | Git Status |
-|------|---------|------------|
-| `.dev.vars` | Local dev secrets (NSW Fuel API Key, Secret, Auth header) | **Gitignored** |
-| `.gitignore` | Ensures secrets are never committed | Tracked |
-| `wrangler.toml` | Cloudflare Workers config (references secrets by name) | Tracked |
-
-## Credentials & Configuration
-
-| Service | Status | Notes |
-|---------|--------|-------|
-| Cloudflare Account | ✅ Verified | Email: george.elnaddaf@gmail.com, Account ID: 5f5ffeb8dcd48af221e419cb5d9eb026 |
-| Cloudflare API Token | ✅ Verified | Global API Key — stored as env var (not in code) |
-| NSW Fuel API Key | ✅ Verified | Stored in .dev.vars (gitignored) |
-| NSW Fuel API Secret | ✅ Verified | Stored in .dev.vars (gitignored) |
-
-> **Security:** All API keys and secrets are stored as Wrangler secrets or environment variables. They are NEVER committed to source code.
-
-### Cloudflare Resources
-
-| Resource | ID | Binding |
-|----------|----|---------|
-| KV Namespace | `4dc4b713a7824574b9c955e83c3d2f5f` | `FUEL_CACHE` |
-| D1 Database | `c1bf122d-441a-4fa9-a7af-3e6838699e63` | `DB` |
-
 ## Project Structure
 
 ```
@@ -184,7 +119,7 @@ npm install
 npx vite build
 
 # Run locally (Workers + static assets on port 8787)
-# Must set Cloudflare env vars first (see Session Resume Guide)
+# Must set Cloudflare env vars first (see .dev.vars)
 npx wrangler dev
 
 # Deploy to Cloudflare
