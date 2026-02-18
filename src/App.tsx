@@ -33,15 +33,17 @@ export default function App() {
 
   const fuelLabel = FUEL_TYPES.find((f) => f.value === selectedFuel)?.label || selectedFuel;
 
-  const handleSearch = useCallback(async () => {
-    if (!searchQuery.trim()) return;
+  const handleSearch = useCallback(async (query?: string) => {
+    const term = (query ?? searchQuery).trim();
+    if (!term) return;
+    if (query) setSearchQuery(term);
     setIsLoading(true);
     setError(null);
     setVisibleCount(20);
     setHasSearched(true);
 
     try {
-      const data = await fetchPricesByLocation(searchQuery.trim(), selectedFuel);
+      const data = await fetchPricesByLocation(term, selectedFuel);
       const merged = mergeStationsWithPrices(
         data.stations,
         data.prices,
@@ -49,7 +51,7 @@ export default function App() {
       );
       setStations(merged);
       if (merged.length === 0) {
-        setError(`No ${fuelLabel} prices found for "${searchQuery}". Try a different suburb or fuel type.`);
+        setError(`No ${fuelLabel} prices found for "${term}". Try a different suburb or fuel type.`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch fuel prices');

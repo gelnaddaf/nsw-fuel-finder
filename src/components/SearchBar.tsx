@@ -5,7 +5,7 @@ import { fetchSuburbs } from '../api/fuel';
 interface SearchBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  onSearch: () => void;
+  onSearch: (query?: string) => void;
   onUseLocation: () => void;
   isLoading: boolean;
   isLocating: boolean;
@@ -69,8 +69,8 @@ export default function SearchBar({
       setShowDropdown(false);
       setSuggestions([]);
       setHighlightIndex(-1);
-      // Auto-search on selection
-      setTimeout(() => onSearch(), 0);
+      // Pass suburb directly to avoid stale closure on searchQuery
+      onSearch(suburb);
     },
     [onSearchChange, onSearch]
   );
@@ -143,7 +143,7 @@ export default function SearchBar({
       </div>
       <div className="flex gap-2">
         <button
-          onClick={onSearch}
+          onClick={() => onSearch()}
           disabled={isLoading || !searchQuery.trim()}
           className="flex items-center gap-2 rounded-xl bg-nsw-blue px-6 py-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-nsw-blue/90 disabled:opacity-50"
         >
